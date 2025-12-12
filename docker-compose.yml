@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  app:
+    build: ./app
+    container_name: go-app
+    ports:
+      - "8080:8080"  # optional; for debugging directly
+    networks:
+      - appnet
+
+  nginx:
+    image: nginx:stable
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - appnet
+
+networks:
+  appnet:
