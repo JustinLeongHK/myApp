@@ -6,6 +6,24 @@ services:
     container_name: go-app
     ports:
       - "8080:8080"  # optional; for debugging directly
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    depends_on:
+      - postgres
+    networks:
+      - appnet
+
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     networks:
       - appnet
 
@@ -23,3 +41,6 @@ services:
 
 networks:
   appnet:
+
+volumes:
+  pgdata:
