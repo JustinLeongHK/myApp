@@ -6,14 +6,13 @@ import (
 	"net/http"
 
 	"github.com/JustinLeongHK/myApp/internal/config"
-	"github.com/JustinLeongHK/myApp/internal/db"
 	"github.com/JustinLeongHK/myApp/internal/user"
 	_ "github.com/lib/pq"
 )
 
 func NewRouter(cfg *config.Config) http.Handler {
 	sqlDB := initDB(cfg)
-	repo := db.New(sqlDB)
+	repo := user.NewPostgresRepository(sqlDB)
 	service := user.NewService(repo)
 	handler := user.NewHandler(service)
 

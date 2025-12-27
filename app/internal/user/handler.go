@@ -3,8 +3,6 @@ package user
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/JustinLeongHK/myApp/internal/model"
 )
 
 type Handler struct {
@@ -21,18 +19,26 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var u model.User
+	var u User
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 		http.Error(w, "invalid request", http.StatusBadRequest)
 		return
 	}
 
-	if err := h.service.Create(r.Context(), u); err != nil {
+	if u.Email == "" {
+		http.Error(w, "email is required", http.StatusBadRequest)
+		return
+	}
+
+	createdUser, err := h.service.Create(r.Context(), u)
+	if err != nil {
 		http.Error(w, "failed to create user", http.StatusInternalServerError)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(createdUser)
 }
 
 func (h *Handler) GetDBTimeHandler(w http.ResponseWriter, r *http.Request) {
